@@ -14,10 +14,8 @@ public class Url {
     private String shortUrl;
     private LocalDateTime expirationTime;
 
-    public Url(String originalUrl, String shortUrl, LocalDateTime expirationTime) {
+    public Url(String originalUrl) {
         this.originalUrl = originalUrl;
-        this.shortUrl = shortUrl;
-        this.expirationTime = expirationTime;
     }
 
     public Url(){}

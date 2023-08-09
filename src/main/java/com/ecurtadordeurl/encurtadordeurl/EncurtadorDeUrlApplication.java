@@ -20,8 +20,15 @@ public class EncurtadorDeUrlApplication {
 	@Bean
 	public CommandLineRunner demo(UrlRepository repository, UrlServices services){
 		return args -> {
-			Url facebook = new Url("facebook.com", services.generateShortCode(), LocalDateTime.now().plusMinutes(5));
-			Url amazon = new Url("amazon.com", services.generateShortCode(), LocalDateTime.now().plusMinutes(5));
+
+			Url facebook = new Url("facebook.com");
+			Url amazon = new Url("amazon.com");
+
+			facebook.setShortUrl(services.generateShortCode());
+			facebook.setExpirationTime(LocalDateTime.now().plusMinutes(5));
+
+			amazon.setShortUrl(services.generateShortCode());
+			amazon.setExpirationTime(LocalDateTime.now().plusMinutes(5));
 
 			repository.save(facebook);
 			repository.save(amazon);

@@ -25,24 +25,27 @@ public class UrlController {
     }
 
     @PostMapping
-    public String getOriginalUrl(@RequestBody Url originalUrl){
-        String shortUrl = urlServices.insertOriginalUrl(originalUrl);
-        return "http://localhost:8080/url/v1/" + shortUrl;
+    public ResponseEntity<Url> getOriginalUrl(@RequestBody Url originalUrl){
+        if (originalUrl.getOriginalUrl().isEmpty()){
+            return new ResponseEntity(originalUrl, HttpStatus.NO_CONTENT);
+        }
+        Url url = urlServices.insertOriginalUrl(originalUrl);
+
+        return new ResponseEntity(url, HttpStatus.OK);
     }
 
     @GetMapping("/{shortCode}")
     public void redirect(@PathVariable String shortCode, HttpServletResponse response) throws IOException {
-        Url url = urlServices.findByCode(shortCode);
-        ResponseEntity<Void> redirectResponse = urlServices.validateAndReturnResponse(url);
-
-        if (redirectResponse.getStatusCode() == HttpStatus.NOT_FOUND) {
-            System.out.println(redirectResponse.getStatusCode());
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } else {
-            String redirectUrl = "https://" + url.getOriginalUrl();
-            System.out.println(redirectResponse.getStatusCode());
-            response.sendRedirect(redirectUrl);
+        if (shortCode.isEmpty()){
+            throw new RuntimeException("short code can't be null");
         }
+
+        Url url = urlServices.findByCode(shortCode);
+
+        urlServices.validateAndReturnResponse(url);
+
+        String redirectUrl = "https://" + url.getOriginalUrl();
+        response.sendRedirect(redirectUrl);
     }
 
     @DeleteMapping("/{id}")
@@ -51,9 +54,9 @@ public class UrlController {
     }
 
     @PutMapping("/{urlId}")
-    public void update(@PathVariable Long id,
-                       @RequestParam String OriginalUrl){
-        urlServices.updateUrl(id, OriginalUrl);
+    public void updateUrl(@PathVariable Long id,
+                       @RequestParam String originalUrl){
+        urlServices.updateUrl(id, originalUrl);
     }
 
 }
